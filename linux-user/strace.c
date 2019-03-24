@@ -11,6 +11,16 @@
 #include <sched.h>
 #include "qemu.h"
 
+#undef TARGET_ABI_FMT_lx
+#ifdef TARGET_ABI32
+#define TARGET_ABI_FMT_lx "%x"
+#else
+#define TARGET_ABI_FMT_lx "%llx"
+#endif
+
+extern FILE *GLOBAL_strace_file;
+#define gemu_log(x...) { fprintf(GLOBAL_strace_file, x); fflush(GLOBAL_strace_file); }
+
 int do_strace=0;
 
 struct syscallname {
@@ -637,10 +647,11 @@ print_raw_param(const char *fmt, abi_long param, int last)
 static void
 print_pointer(abi_long p, int last)
 {
-    if (p == 0)
+    if (p == 0) {
         gemu_log("NULL%s", get_comma(last));
-    else
+    } else {
         gemu_log("0x" TARGET_ABI_FMT_lx "%s", p, get_comma(last));
+    }
 }
 
 /*
@@ -1562,6 +1573,8 @@ static const struct syscallname scnames[] = {
 
 static int nsyscalls = ARRAY_SIZE(scnames);
 
+uint32_t get_current_clnum(void);
+
 /*
  * The public interface to this module.
  */
@@ -1573,6 +1586,7 @@ print_syscall(int num,
     int i;
     const char *format="%s(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ")";
 
+    gemu_log("%d ", get_current_clnum() );
     gemu_log("%d ", getpid() );
 
     for(i=0;i<nsyscalls;i++)

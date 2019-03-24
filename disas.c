@@ -172,6 +172,7 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
     return print_insn_objdump(pc, info, "OBJD-T");
 }
 
+
 /* Disassemble this for me please... (debugging). 'flags' has the following
    values:
     i386 - 1 means 16 bit code, 2 means 64 bit code
@@ -179,7 +180,7 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
            bit 16 indicates little endian.
     other targets - unused
  */
-void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+void real_target_disas(FILE *out, CPUState *cpu, target_ulong code,
                   target_ulong size, int flags)
 {
     CPUClass *cc = CPU_GET_CLASS(cpu);
@@ -228,7 +229,7 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
         s.info.mach = bfd_mach_ppc;
 #endif
     }
-    s.info.disassembler_options = (char *)"any";
+    s.info.disassembler_options = (char *)"intel";
     s.info.print_insn = print_insn_ppc;
 #endif
     if (s.info.print_insn == NULL) {
@@ -236,6 +237,10 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
     }
 
     for (pc = code; size > 0; pc += count, size -= count) {
+    #ifdef TARGET_ARM
+    if (flags & 1) fprintf(out, "t");
+    else fprintf(out, "n");
+    #endif
 	fprintf(out, "0x" TARGET_FMT_lx ":  ", pc);
 	count = s.info.print_insn(pc, &s.info);
 #if 0
