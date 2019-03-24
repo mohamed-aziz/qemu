@@ -30,6 +30,34 @@
 #include "tcg-op.h"
 #include "librarymap.h"
 
+struct librarymap *GLOBAL_librarymap;
+
+void init_librarymap(void){
+  GLOBAL_librarymap = malloc(sizeof(struct librarymap));
+  memset(GLOBAL_librarymap, 0, sizeof(struct librarymap));
+  GLOBAL_librarymap->name = "dummy";
+}
+
+void add_to_librarymap(const char *name, abi_ulong begin, abi_ulong end){
+  struct librarymap *cur, *newmap;
+  for(cur = GLOBAL_librarymap; cur->next != NULL; cur = cur->next);
+  newmap = malloc(sizeof(struct librarymap));
+  newmap->next = NULL;
+  newmap->begin = begin;
+  newmap->end = end;
+  newmap->name = strdup(name);
+  cur->next = newmap;
+}
+
+bool is_library_addr(abi_ulong addr){
+  struct librarymap *cur = GLOBAL_librarymap;
+  while(cur != NULL){
+    if (addr >= cur->begin && addr <= cur->end) return true;
+    cur = cur->next;
+  }
+  return false;
+}
+
 /* Marker for missing code. */
 #define TODO() \
     do { \
@@ -848,7 +876,6 @@ bool is_filtered_address(target_ulong pc, bool ignore_gatetrace) {
   }
 }
 
-void real_target_disas(FILE *out, CPUState *env, target_ulong code, target_ulong size, int flags);
 void target_disas(FILE *out, CPUState *env, target_ulong code, target_ulong size, int flags) {
   OPEN_GLOBAL_ASM_FILE
 
@@ -1067,22 +1094,20 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
             }
 #endif
 #ifdef TARGET_ARM
-            struct change *a = NULL;
             if ((void*)t0 == helper_exception_with_syndrome) {
               if (GLOBAL_logstate->is_filtered == 1) {
                 commit_pending_changes();
               }
-              a = track_syscall_begin(env, env->regs[0]);
+              track_syscall_begin(env, env->regs[0]);
               GLOBAL_last_was_syscall = 1;
             }
 #endif
 #ifdef TARGET_MIPS
-            struct change *a = NULL;
             if ((void*)t0 == helper_raise_exception && a1 == EXCP_SYSCALL) {
               if (GLOBAL_logstate->is_filtered == 1) {
                 commit_pending_changes();
               }
-              a = track_syscall_begin(env, env->active_tc.gpr[2]);
+              track_syscall_begin(env, env->active_tc.gpr[2]);
               GLOBAL_last_was_syscall = 1;
             }
 #endif

@@ -15,6 +15,7 @@
 
 #include "qemu.h"
 #include "disas/disas.h"
+#include "librarymap.h"
 
 #ifdef _ARCH_PPC64
 #undef ARCH_DLINFO

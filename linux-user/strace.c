@@ -13,8 +13,10 @@
 
 #undef TARGET_ABI_FMT_lx
 #ifdef TARGET_ABI32
+typedef unsigned int abi_ulonglong;
 #define TARGET_ABI_FMT_lx "%x"
 #else
+typedef unsigned long long abi_ulonglong;
 #define TARGET_ABI_FMT_lx "%llx"
 #endif
 
@@ -231,7 +233,7 @@ print_semctl(const struct syscallname *name,
 {
     gemu_log("%s(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ",", name->name, arg1, arg2);
     print_ipc_cmd(arg3);
-    gemu_log(",0x" TARGET_ABI_FMT_lx ")", arg4);
+    gemu_log(",0x" TARGET_ABI_FMT_lx ")", (abi_ulonglong)arg4);
 }
 #endif
 
@@ -301,7 +303,7 @@ print_syscall_ret_addr(const struct syscallname *name, abi_long ret)
     if (errstr) {
         gemu_log(" = -1 errno=%d (%s)\n", (int)-ret, errstr);
     } else {
-        gemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
+        gemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", (abi_ulonglong)ret);
     }
 }
 
@@ -650,7 +652,7 @@ print_pointer(abi_long p, int last)
     if (p == 0) {
         gemu_log("NULL%s", get_comma(last));
     } else {
-        gemu_log("0x" TARGET_ABI_FMT_lx "%s", p, get_comma(last));
+        gemu_log("0x" TARGET_ABI_FMT_lx "%s", (abi_ulonglong)p, get_comma(last));
     }
 }
 

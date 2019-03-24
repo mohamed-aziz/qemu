@@ -275,7 +275,6 @@ void cpu_loop(CPUX86State *env)
     int trapnr;
     abi_ulong pc;
     target_siginfo_t info;
-    void *a;
 
     for(;;) {
         cpu_exec_start(cs);
