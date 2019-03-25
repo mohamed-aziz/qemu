@@ -1880,8 +1880,8 @@ exit:
 #ifdef QIRA_TRACKING
     // this fixes the jump instruction merging bug
     // with the last_pc hack for ARM, might break some x86 reps
-    if (next_tb != 0 && last_pc != tb->pc) {
-      next_tb = 0;
+    if (ret != 0 && last_pc != tb->pc) {
+      ret = 0;
     }
 #endif
     last_pc = tb->pc;
