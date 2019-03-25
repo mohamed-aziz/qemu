@@ -1078,10 +1078,10 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, TranslationBlock *tb)
         switch (opc) {
         case INDEX_op_call:
             t0 = tci_read_ri(regs, &tb_ptr);
-            a0 = tci_read_reg(TCG_REG_R0);
-            a1 = tci_read_reg(TCG_REG_R1);
-            a2 = tci_read_reg(TCG_REG_R2);
-            a3 = tci_read_reg(TCG_REG_R3);
+            a0 = tci_read_reg(regs, TCG_REG_R0);
+            a1 = tci_read_reg(regs, TCG_REG_R1);
+            a2 = tci_read_reg(regs, TCG_REG_R2);
+            a3 = tci_read_reg(regs, TCG_REG_R3);
             //printf("op_call: %X\n", t0);
             // helper_function raise_interrupt, load_seg
 #ifdef R_EAX
