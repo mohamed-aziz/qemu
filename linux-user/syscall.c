@@ -11528,8 +11528,10 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
         if (fd >= 30){
             add_to_librarymap("unknown", mapaddr, mapaddr+size);
         }
+#ifdef TARGET_NR_open
     }else if (num == TARGET_NR_open){
         /* here we could store the fd->libname mapping */
+#endif
     }else if (num == TARGET_NR_close){
         /* here we could clear the fd->libname mapping */
     }
