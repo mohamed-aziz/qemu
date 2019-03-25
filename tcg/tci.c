@@ -886,13 +886,13 @@ bool is_filtered_address(target_ulong pc, bool ignore_gatetrace) {
   }
 }
 
-void target_disas(FILE *out, CPUState *env, target_ulong code, target_ulong size, int flags) {
+void target_disas(FILE *out, CPUState *env, target_ulong code, target_ulong size) {
   OPEN_GLOBAL_ASM_FILE
 
   if (is_filtered_address(code, true)) return;
 
   flock(fileno(GLOBAL_asm_file), LOCK_EX);
-  real_target_disas(GLOBAL_asm_file, env, code, size, flags);
+  real_target_disas(GLOBAL_asm_file, env, code, size);
   flock(fileno(GLOBAL_asm_file), LOCK_UN);
 
   fflush(GLOBAL_asm_file);

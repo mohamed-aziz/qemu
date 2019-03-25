@@ -422,7 +422,7 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
 
 /* Disassemble this for me please... (debugging).  */
 void real_target_disas(FILE *out, CPUState *cpu, target_ulong code,
-                  target_ulong size, int flags)
+                  target_ulong size)
 {
     CPUClass *cc = CPU_GET_CLASS(cpu);
     target_ulong pc;
@@ -461,10 +461,6 @@ void real_target_disas(FILE *out, CPUState *cpu, target_ulong code,
     }
 
     for (pc = code; size > 0; pc += count, size -= count) {
-    #ifdef TARGET_ARM
-    if (flags & 1) fprintf(out, "t");
-    else fprintf(out, "n");
-    #endif
 	fprintf(out, "0x" TARGET_FMT_lx ":  ", pc);
 	count = s.info.print_insn(pc, &s.info);
 	fprintf(out, "\n");
