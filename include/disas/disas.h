@@ -8,8 +8,14 @@
 
 /* Disassemble this for me please... (debugging). */
 void disas(FILE *out, void *code, unsigned long size);
+
+// this is hooked in tci.c for qira
 void target_disas(FILE *out, CPUState *cpu, target_ulong code,
-                  target_ulong size);
+                  target_ulong size, int flags);
+
+// this is the old function in disas.c
+void real_target_disas(FILE *out, CPUState *cpu, target_ulong code,
+                       target_ulong size, int flags);
 
 void monitor_disas(Monitor *mon, CPUState *cpu,
                    target_ulong pc, int nb_insn, int is_physical);

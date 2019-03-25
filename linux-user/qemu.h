@@ -18,6 +18,9 @@
 #include "exec/gdbstub.h"
 #include "qemu/queue.h"
 
+#define QIRA_TRACKING
+
+
 /* This is the size of the host kernel's sigset_t, needed where we make
  * direct system calls that take a sigset_t pointer and a size.
  */
@@ -596,10 +599,16 @@ abi_long copy_to_user(abi_ulong gaddr, void *hptr, size_t len);
    any byteswapping.  lock_user may return either a pointer to the guest
    memory, or a temporary buffer.  */
 
+#ifdef QIRA_TRACKING
+void track_kernel_read(void *host_addr, target_ulong guest_addr, long len);
+void track_kernel_write(void *host_addr, target_ulong guest_addr, long len);
+#endif
+
 /* Lock an area of guest memory into the host.  If copy is true then the
    host area will have the same contents as the guest.  */
 static inline void *lock_user(int type, abi_ulong guest_addr, long len, int copy)
 {
+    void *ret;
     if (!access_ok(type, guest_addr, len))
         return NULL;
 #ifdef DEBUG_REMAP
@@ -610,11 +619,18 @@ static inline void *lock_user(int type, abi_ulong guest_addr, long len, int copy
             memcpy(addr, g2h(guest_addr), len);
         else
             memset(addr, 0, len);
-        return addr;
+        ret = addr;
     }
 #else
-    return g2h(guest_addr);
+    ret = g2h(guest_addr);
 #endif
+
+#ifdef QIRA_TRACKING
+    if (type == VERIFY_READ) {
+      track_kernel_read(ret, guest_addr, len);
+    }
+#endif
+    return ret;
 }
 
 /* Unlock an area of guest memory.  The first LEN bytes must be
@@ -623,6 +639,11 @@ static inline void *lock_user(int type, abi_ulong guest_addr, long len, int copy
 static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
                                long len)
 {
+#ifdef QIRA_TRACKING
+    if (len > 0) {
+      track_kernel_write(host_ptr, guest_addr, len);
+    }
+#endif
 
 #ifdef DEBUG_REMAP
     if (!host_ptr)

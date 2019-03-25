@@ -6886,6 +6886,8 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
     return 0;
 }
 
+extern void add_to_librarymap(const char *name, abi_ulong begin, abi_ulong end);
+
 /* This is an internal helper for do_syscall so that it is easier
  * to have a single return point, so that actions, such as logging
  * of syscall results, can be performed.
@@ -11513,6 +11515,23 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
     } else {
         ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
                           arg5, arg6, arg7, arg8);
+    }
+
+#ifdef TARGET_NR_mmap2
+    if (num == TARGET_NR_mmap || num == TARGET_NR_mmap2){
+#else
+    if (num == TARGET_NR_mmap){
+#endif
+        int fd = arg5;
+        target_ulong mapaddr = ret;
+        target_ulong size = arg2;
+        if (fd >= 30){
+            add_to_librarymap("unknown", mapaddr, mapaddr+size);
+        }
+    }else if (num == TARGET_NR_open){
+        /* here we could store the fd->libname mapping */
+    }else if (num == TARGET_NR_close){
+        /* here we could clear the fd->libname mapping */
     }
 
     trace_guest_user_syscall_ret(cpu, num, ret);

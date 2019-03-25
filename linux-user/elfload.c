@@ -7,6 +7,7 @@
 #include "qemu.h"
 #include "disas/disas.h"
 #include "qemu/path.h"
+#include "librarymap.h"
 
 #ifdef _ARCH_PPC64
 #undef ARCH_DLINFO
@@ -2183,6 +2184,9 @@ exit_errmsg:
 }
 
 
+extern struct library *GLOBAL_librarymap;
+extern const char *filename;
+
 /* Load an ELF image into the address space.
 
    IMAGE_NAME is the filename of the image, to use in error messages.
@@ -2261,6 +2265,12 @@ static void load_elf_image(const char *image_name, int image_fd,
         load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
                                 MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
                                 -1, 0);
+
+        if (strcmp(filename, image_name)){
+            if (GLOBAL_librarymap == NULL) init_librarymap();
+            add_to_librarymap(image_name, load_addr, load_addr+(hiaddr-loaddr));
+        }
+
         if (load_addr == -1) {
             goto exit_perror;
         }
