@@ -970,11 +970,11 @@ void write_out_base(CPUArchState *env, int id) {
 
 
 /* Interpret pseudo code in tb. */
-uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+uintptr_t tcg_qemu_tb_exec(CPUArchState *env, TranslationBlock *tb)
 {
+    uint8_t *tb_ptr = tb->tc.ptr;
 #ifdef QIRA_TRACKING
-    CPUState *cpu = ENV_GET_CPU(env);
-    TranslationBlock *tb = cpu->current_tb;
+    //CPUState *cpu = ENV_GET_CPU(env);
     //TaskState *ts = (TaskState *)cpu->opaque;
 
     if (unlikely(GLOBAL_QIRA_did_init == 0)) { 
