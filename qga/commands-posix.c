@@ -10,7 +10,7 @@
  * This work is licensed under the terms of the GNU GPL, version 2 or later.
  * See the COPYING file in the top-level directory.
  */
-
+#include <sys/sysmacros.h>
 #include <glib.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>

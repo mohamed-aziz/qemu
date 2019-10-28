@@ -1,3 +1,4 @@
+#include <sys/sysmacros.h>
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>

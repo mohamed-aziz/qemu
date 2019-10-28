@@ -34,21 +34,21 @@
 
 #include "qemu/memfd.h"
 
-#ifdef CONFIG_MEMFD
-#include <sys/memfd.h>
-#elif defined CONFIG_LINUX
-#include <sys/syscall.h>
-#include <asm/unistd.h>
+/* #ifdef CONFIG_MEMFD */
+/* #include <sys/memfd.h> */
+/* #elif defined CONFIG_LINUX */
+/* #include <sys/syscall.h> */
+/* #include <asm/unistd.h> */
 
-static int memfd_create(const char *name, unsigned int flags)
-{
-#ifdef __NR_memfd_create
-    return syscall(__NR_memfd_create, name, flags);
-#else
-    return -1;
-#endif
-}
-#endif
+/* static int memfd_create(const char *name, unsigned int flags) */
+/* { */
+/* #ifdef __NR_memfd_create */
+/*     return syscall(__NR_memfd_create, name, flags); */
+/* #else */
+/*     return -1; */
+/* #endif */
+/* } */
+/* #endif */
 
 #ifndef MFD_CLOEXEC
 #define MFD_CLOEXEC 0x0001U
